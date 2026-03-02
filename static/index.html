@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🎓 Платформа проектов</title>
+  
+  <!-- Подключаем CSS файлы -->
+  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/components.css" />
+  <link rel="stylesheet" href="css/admin.css" />
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">🎓 Платформа проектов</div>
+      <div class="header-actions" id="headerActions">
+        <button class="btn btn-outline" onclick="reloadData()">🔄 Обновить</button>
+        <button class="btn btn-primary" onclick="openModal()">🔐 Войти</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    
+    <!-- Search & Filters -->
+    <section class="search-section">
+      <div class="search-row">
+        <div class="search-input-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Поиск темы проекта..." />
+        </div>
+        <select class="filter-select" id="classFilter">
+          <option value="">Все классы</option>
+          <option value="5">5 класс</option>
+          <option value="6">6 класс</option>
+          <option value="7">7 класс</option>
+          <option value="8">8 класс</option>
+          <option value="9">9 класс</option>
+          <option value="10">10 класс</option>
+          <option value="11">11 класс</option>
+        </select>
+        <select class="filter-select" id="subjectFilter">
+          <option value="">Все предметы</option>
+          <option value="Математика">Математика</option>
+          <option value="Информатика">Информатика</option>
+          <option value="Биология">Биология</option>
+          <option value="Химия">Химия</option>
+          <option value="Физика">Физика</option>
+          <option value="История">История</option>
+        </select>
+        <button class="reload-btn" id="reloadBtn" onclick="reloadData()">
+          <span>🔄</span>
+          <span>Обновить</span>
+        </button>
+      </div>
+      
+      <div class="category-tabs">
+        <button class="category-tab active" data-category="all">Все темы</button>
+        <button class="category-tab" data-category="popular">Популярные</button>
+        <button class="category-tab" data-category="Исследовательский">Исследования</button>
+        <button class="category-tab" data-category="Технический">Технологии</button>
+        <button class="category-tab" data-category="Социальный">Социальные</button>
+        <button class="category-tab" data-category="Творческий">Творческие</button>
+      </div>
+    </section>
+
+    <!-- Popular Section -->
+    <div class="section-header">
+      <h2 class="section-title">🔥 Популярные темы</h2>
+      <a href="#" class="view-all">Посмотреть все →</a>
+    </div>
+    <div class="projects-grid" id="popularProjects"></div>
+
+    <!-- By Level Section -->
+    <div class="section-header">
+      <h2 class="section-title">📊 По уровню</h2>
+      <div class="level-toggle">
+        <button class="level-btn active" data-level="all">Все</button>
+        <button class="level-btn" data-level="basic">Базовый</button>
+        <button class="level-btn" data-level="advanced">Углублённый</button>
+      </div>
+    </div>
+    <div class="projects-grid" id="levelProjects"></div>
+  </div>
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>🔐 Вход в систему</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Логин</label>
+          <input type="text" id="loginInput" placeholder="admin или student" required />
+        </div>
+        <div class="form-group">
+          <label>Пароль</label>
+          <input type="password" id="passwordInput" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Войти</button>
+        <p class="demo-hint">
+          💡 Демо-доступ:<br>
+          👨‍💼 Админ: <code>admin / admin123</code><br>
+          👨‍ Ученик: <code>student / student123</code>
+        </p>
+      </form>
+      <div id="loginError" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- Admin Modal -->
+  <div id="adminModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>⚙️ Панель администратора</h3>
+        <button class="modal-close" onclick="closeAdminModal()">&times;</button>
+      </div>
+      <div class="admin-section">
+        <h4>📤 Загрузить новые темы проектов</h4>
+        <p style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;">
+          Загрузите Excel-файл с колонками:<br>
+          <code>Название, Описание, Уровень, Теги, Заказов, Провайдер, Цвет, Срок, Участников</code>
+        </p>
+        <form id="uploadForm" onsubmit="handleUpload(event)">
+          <div class="form-group">
+            <label>Выберите файл .xlsx</label>
+            <input type="file" id="fileInput" accept=".xlsx" required />
+          </div>
+          <button type="submit" class="btn btn-primary btn-block" id="uploadBtn">
+            📤 Загрузить и обновить
+          </button>
+        </form>
+        <div id="uploadStatus" class="upload-status"></div>
+      </div>
+      <div class="admin-section">
+        <h4>📊 Статистика</h4>
+        <div class="stats-grid">
+          <div class="stat-card">
+            <span class="stat-number" id="totalProjects">0</span>
+            <span class="stat-label">Всего проектов</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" id="totalUsers">0</span>
+            <span class="stat-label">Пользователей</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
+
+  <!-- Подключаем JS файлы (порядок важен!) -->
+  <script src="js/config.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
